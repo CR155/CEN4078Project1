@@ -1,6 +1,26 @@
 #include "tcpSC.h"
 #include <ctype.h>
+#define MAX 80
 
+void func(int connfd)
+{
+    char buff[MAX];
+    int n;
+    for (;;) {
+        bzero(buff, MAX);
+
+        read(connfd, buff, sizeof(buff));
+        printf("From client: %s\t To client : ", buff);
+        bzero(buff, MAX);
+        n = 0;
+        while ((buff[n++] = getchar() != '\n'));
+        write(connfd, buff, sizeof(buff));
+        if (strncmp("quit", buff, 4) == 0) {
+            printf("Server Quit...\n");
+            break;
+        }
+    }
+}
 int main() {
 
 #if defined(_WIN32)
@@ -18,10 +38,10 @@ int main() {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = IPPROTO_TCP;
 
     struct addrinfo *bind_address;
-    getaddrinfo(0, "8080", &hints, &bind_address);
-
+    getaddrinfo(SOCK_STREAM, IPPROTO_TCP, &hints, &bind_address);
 
     printf("Creating socket...\n");
     SOCKET socket_listen;
@@ -59,6 +79,7 @@ int main() {
     while(1) {
         fd_set reads;
         reads = master;
+
         if (select(max_socket+1, &reads, 0, 0, 0) < 0) {
             fprintf(stderr, "select() failed. (%d)\n", GETSOCKETERRNO());
             return 1;
@@ -72,8 +93,8 @@ int main() {
                     struct sockaddr_storage client_address;
                     socklen_t client_len = sizeof(client_address);
                     SOCKET socket_client = accept(socket_listen,
-                            (struct sockaddr*) &client_address,
-                            &client_len);
+                                                  (struct sockaddr *) &client_address,
+                                                  &client_len);
                     if (!ISVALIDSOCKET(socket_client)) {
                         fprintf(stderr, "accept() failed. (%d)\n",
                                 GETSOCKETERRNO());
@@ -85,13 +106,14 @@ int main() {
                         max_socket = socket_client;
 
                     char address_buffer[100];
-                    getnameinfo((struct sockaddr*)&client_address,
-                            client_len,
-                            address_buffer, sizeof(address_buffer), 0, 0,
-                            NI_NUMERICHOST);
+                    getnameinfo((struct sockaddr *) &client_address,
+                                client_len,
+                                address_buffer, sizeof(address_buffer), 0, 0,
+                                NI_NUMERICHOST);
                     printf("New connection from %s\n", address_buffer);
+                    func(socket_client);
 
-                } else {
+            } else {
                     char read[1024];
                     int bytes_received = recv(i, read, 1024, 0);
                     if (bytes_received < 1) {

@@ -1,8 +1,27 @@
 #include "tcpSC.h"
-
 #if defined(_WIN32)
 #include <conio.h>
 #endif
+#define MAX 80
+void func(int sockfd)
+{
+    char buff[MAX];
+    int n;
+    for (;;) {
+        bzero(buff, sizeof(buff));
+        printf("Enter the string : ");
+        n = 0;
+        while ((buff[n++] = getchar()) != '\n');
+        write(sockfd, buff, sizeof(buff));
+        bzero(buff, sizeof(buff));
+        read(sockfd, buff, sizeof(buff));
+        printf("From Server : %s", buff);
+        if ((strncmp(buff, "quit", 4)) == 0) {
+            printf("Client Quit...\n");
+            break;
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
 
@@ -59,7 +78,8 @@ int main(int argc, char *argv[]) {
     freeaddrinfo(peer_address);
 
     printf("Connected.\n");
-    printf("To send data, enter text followed by enter.\n");
+    //printf("To send data, enter text followed by enter.\n");
+    func(socket_peer);
 
     while(1) {
 
