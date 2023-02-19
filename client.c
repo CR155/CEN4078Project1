@@ -9,13 +9,14 @@ void func(int sockfd)
     int n;
     for (;;) {
         bzero(buff, sizeof(buff));
-        printf("Enter the string : ");
+        printf("To Server: ");
         n = 0;
-        while ((buff[n++] = getchar()) != '\n');
+        while ((buff[n++] = getchar() != '\n'))
+            ;
         write(sockfd, buff, sizeof(buff));
         bzero(buff, sizeof(buff));
         read(sockfd, buff, sizeof(buff));
-        printf("From Server : %s", buff);
+        printf("From Server: %s", buff);
         if ((strncmp(buff, "quit", 4)) == 0) {
             printf("Client Quit...\n");
             break;

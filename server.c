@@ -8,12 +8,12 @@ void func(int connfd)
     int n;
     for (;;) {
         bzero(buff, MAX);
-
         read(connfd, buff, sizeof(buff));
-        printf("From client: %s\t To client : ", buff);
+        printf("From Client: %s\n\t To Client: ", buff);
         bzero(buff, MAX);
         n = 0;
-        while ((buff[n++] = getchar() != '\n'));
+        while ((buff[n++] = getchar()) != '\n' && buff[n++] != '\r')
+            ;
         write(connfd, buff, sizeof(buff));
         if (strncmp("quit", buff, 4) == 0) {
             printf("Server Quit...\n");
@@ -21,6 +21,7 @@ void func(int connfd)
         }
     }
 }
+
 int main() {
 
 #if defined(_WIN32)
@@ -41,7 +42,7 @@ int main() {
     hints.ai_protocol = IPPROTO_TCP;
 
     struct addrinfo *bind_address;
-    getaddrinfo(SOCK_STREAM, IPPROTO_TCP, &hints, &bind_address);
+    getaddrinfo(0, "8080", &hints, &bind_address);
 
     printf("Creating socket...\n");
     SOCKET socket_listen;
