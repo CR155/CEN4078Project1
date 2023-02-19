@@ -1,8 +1,10 @@
 #include "tcpSC.h"
+
 #if defined(_WIN32)
 #include <conio.h>
 #endif
 #define MAX 80
+
 void func(int sockfd)
 {
     char buff[MAX];
@@ -11,14 +13,14 @@ void func(int sockfd)
         bzero(buff, sizeof(buff));
         printf("To Server: ");
         n = 0;
-        while ((buff[n++] = getchar() != '\n'))
+        while ((buff[n++] = getchar()) != '\n')
             ;
         write(sockfd, buff, sizeof(buff));
         bzero(buff, sizeof(buff));
         read(sockfd, buff, sizeof(buff));
         printf("From Server: %s", buff);
         if ((strncmp(buff, "quit", 4)) == 0) {
-            printf("Client Quit...\n");
+            printf("Client Quit...");
             break;
         }
     }

@@ -1,22 +1,29 @@
 #include "tcpSC.h"
 #include <ctype.h>
 #define MAX 80
-
 void func(int connfd)
 {
     char buff[MAX];
     int n;
     for (;;) {
         bzero(buff, MAX);
+
+        // read message from client and copy into buffer
         read(connfd, buff, sizeof(buff));
-        printf("From Client: %s\n\t To Client: ", buff);
+
+        // print buffer which contains client content
+        printf("From Client: %sTo Client: ", buff);
         bzero(buff, MAX);
         n = 0;
-        while ((buff[n++] = getchar()) != '\n' && buff[n++] != '\r')
+        while ((buff[n++] = getchar()) != '\n')
             ;
+
+        // send buffer to client
         write(connfd, buff, sizeof(buff));
+
+        // if message contains quit then server quits and chat ends
         if (strncmp("quit", buff, 4) == 0) {
-            printf("Server Quit...\n");
+            printf("Server Quit...");
             break;
         }
     }
