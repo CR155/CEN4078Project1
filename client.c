@@ -19,10 +19,12 @@ void func(int sockfd)
         bzero(buff, sizeof(buff));
         read(sockfd, buff, sizeof(buff));
         printf("From Server: %s", buff);
-        if ((strncmp(buff, "quit", 4)) == 0) {
-            printf("Client Quit...");
+        /*
+        if (strncmp(buff, "exit", 4) == 0) {
+            printf("Client Quit...\n");
             break;
         }
+        */
     }
 }
 

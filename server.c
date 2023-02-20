@@ -1,8 +1,8 @@
 #include "tcpSC.h"
 #include <ctype.h>
+#include <stdlib.h>
 #define MAX 80
-void func(int connfd)
-{
+void func(int connfd) {
     char buff[MAX];
     int n;
     for (;;) {
@@ -13,19 +13,22 @@ void func(int connfd)
 
         // print buffer which contains client content
         printf("From Client: %sTo Client: ", buff);
-        bzero(buff, MAX);
-        n = 0;
-        while ((buff[n++] = getchar()) != '\n')
-            ;
-
-        // send buffer to client
-        write(connfd, buff, sizeof(buff));
-
-        // if message contains quit then server quits and chat ends
-        if (strncmp("quit", buff, 4) == 0) {
-            printf("Server Quit...");
+        if (strncmp(buff, "exit", 4) == 0) {
+            printf("Server Exit...\n");
             break;
         }
+        bzero(buff, MAX);
+        n = 0;
+        while ((buff[n++] = getchar()) != '\n');
+        // send buffer to client
+        write(connfd, buff, sizeof(buff));
+        // if message contains quit then server quits and chat ends
+        /*
+        if (strncmp(buff, "exit", 4) == 0) {
+            printf("Server Exit...\n");
+            break;
+        }
+         */
     }
 }
 
